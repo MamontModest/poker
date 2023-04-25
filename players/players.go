@@ -13,17 +13,17 @@ type Cards struct {
 }
 
 type Player struct {
-	//банк игрока
-	money int
+	//id player
+	uid int
 	//карты игрока
 	cards *Cards
 	//статус в раздаче
 	status bool
 }
 
-func NewPlayer(value int) *Player {
+func NewPlayer(uid int) *Player {
 	return &Player{
-		money: value,
+		uid: uid,
 		cards: &Cards{
 			firt_card: &Card{
 				suit:  "no",
