@@ -1,39 +1,34 @@
 package players
 
-type Card struct {
-	//масть
-	suit string
-	//значение
-	value string
-}
-
-type Cards struct {
-	firt_card   *Card
-	second_card *Card
-}
-
 type Player struct {
 	//id player
-	uid int
+	Uid int
 	//карты игрока
-	cards *Cards
+	Cards *Cards
 	//статус в раздаче
-	status bool
+	Status bool
+	//банк
+	Bank int
 }
 
 func NewPlayer(uid int) *Player {
 	return &Player{
-		uid: uid,
-		cards: &Cards{
-			firt_card: &Card{
-				suit:  "no",
-				value: "no",
+		Uid: uid,
+		Cards: &Cards{
+			Firt_card: &Card{
+				Suit:  "no",
+				Value: "no",
 			},
-			second_card: &Card{
-				suit:  "no",
-				value: "no",
+			Second_card: &Card{
+				Suit:  "no",
+				Value: "no",
 			},
 		},
-		status: true,
+		Status: true,
+		Bank:   0,
 	}
+}
+func Connect_game(t *PokerGame, user *Player) {
+	user.Bank = t.Start_balance
+	t.Players = append(t.Players, *user)
 }
