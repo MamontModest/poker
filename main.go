@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/MamontModest/Poker/players"
 	"golang.org/x/net/websocket"
 	"io"
 	"net/http"
@@ -24,7 +23,6 @@ func (s *Server) handleWS(ws *websocket.Conn) {
 	s.conns[ws] = true
 
 	s.readLoop(ws)
-
 }
 func (s *Server) broadcast(b []byte) {
 	for ws := range s.conns {

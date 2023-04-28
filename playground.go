@@ -33,8 +33,10 @@ func main() {
 				}
 			}
 		}
+		/*   Вывод таблицы
 		for i, v := range list_tables {
 			fmt.Println("room id: ", i, v.Players)
 		}
+		*/
 	}
 }
