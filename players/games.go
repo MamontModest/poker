@@ -1,7 +1,6 @@
 package players
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -57,6 +56,5 @@ func Razdacha(t *PokerGame) {
 		game_card := cards_now[value]
 		cards_now = append(cards_now[:value], cards_now[value+1:]...)
 		t.Game_cards = append(t.Game_cards, *game_card)
-		fmt.Println(t.Game_cards[i])
 	}
 }

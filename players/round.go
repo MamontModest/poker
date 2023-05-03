@@ -1,27 +1,30 @@
 package players
 
 import (
-	"errors"
 	"fmt"
 )
 
 //// тут должна быть логика раунда в игре
 
 type drop struct {
-	players     []Player
-	max_bet     int
-	bets        map[Player]int
+	players []Player
+	max_bet int
+	//map[uid]bet
+	bets        map[int]int
 	small_blind int
-	folt        []Player
+	//[]uid
+	Fold        []int
+	link_player int
 }
 
 func create_drop(p []Player, s int) *drop {
 	return &drop{
 		max_bet:     0,
 		players:     p,
-		bets:        make(map[Player]int),
+		bets:        make(map[int]int),
 		small_blind: s,
-		folt:        make([]Player, 0),
+		Fold:        make([]int, 0),
+		link_player: 0,
 	}
 }
 func Start_round(t *PokerGame) {
@@ -31,46 +34,57 @@ func Start_round(t *PokerGame) {
 }
 func play_drop(d *drop) {
 	var s string
-	var uid int
+	var uid, value int
+	j := d.link_player + 2
+	d.blinds(d.small_blind)
 
-	d.players[0].Bank -= d.small_blind
+	for _, v := range d.players {
+		fmt.Println("bank", v.Bank, "\tcards", v.Cards.Firt_card, v.Cards.Second_card)
+	}
 
-	fmt.Println(d.players[0].Bank, "small_blind\n", "cards", d.players[0].Cards.Firt_card, d.players[0].Cards.Second_card)
-	d.players[1].Bank -= d.small_blind * 20
-
-	for len(d.folt) != 1 {
+	for j <= d.link_player {
+		i, err := d.next_player(j)
+		j = i
+		if err != nil {
+			fmt.Println("остался один игрок")
+			break
+		}
+		fmt.Println("вводи данные")
 		fmt.Scan(&s, &uid)
 		switch s {
-		case "falt":
-			d.falt(uid)
+		case "fold":
+			d.fold(uid)
+
 		case "call":
 			err := d.call(uid)
 			if err != nil {
 				fmt.Println("print again bro")
 			}
 
-		}
-	}
-	fmt.Println("fall")
-}
-
-func (p *drop) falt(uid int) {
-	for _, v := range p.players {
-		if v.Uid == uid {
-			v.Status = false
-			p.folt = append(p.folt, v)
-		}
-	}
-}
-func (p *drop) call(uid int) error {
-	for _, v := range p.players {
-		if v.Uid == uid {
-			if v.Bank+p.bets[v] < p.max_bet {
-				return errors.New("not enough money")
+		case "raise":
+			fmt.Scan(&value)
+			err := d.raise(uid, value)
+			if err != nil {
+				fmt.Println("no raise bro")
 			}
-			p.bets[v] = p.max_bet
-			break
+
+		case "all_in":
+			d.all_in(uid)
+
+		case "check":
+			err := d.check(uid)
+			if err != nil {
+				fmt.Println("no chek")
+			}
+		}
+
+		for _, v := range d.players {
+			fmt.Println("bank", v.Bank, "\tcards", v.Cards.Firt_card, v.Cards.Second_card, "\tbet", d.bets[v.Uid])
 		}
 	}
-	return nil
+
+	for i, v := range d.players {
+		fmt.Println(d.players[i].Bank, " -bank", "\tbet- ", d.bets[v.Uid], d.players[i].Status)
+	}
+	fmt.Println("ROUND END")
 }
