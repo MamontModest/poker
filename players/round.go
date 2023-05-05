@@ -1,8 +1,6 @@
 package players
 
-import (
-	"fmt"
-)
+import "fmt"
 
 //// тут должна быть логика раунда в игре
 
@@ -13,42 +11,40 @@ type drop struct {
 	bets        map[int]int
 	small_blind int
 	//[]uid
-	Fold        []int
-	link_player int
+	Fold               []int
+	link_active_player int
+	link_diller        int
 }
 
 func create_drop(p []Player, s int) *drop {
 	return &drop{
-		max_bet:     0,
-		players:     p,
-		bets:        make(map[int]int),
-		small_blind: s,
-		Fold:        make([]int, 0),
-		link_player: 0,
+		max_bet:            0,
+		players:            p,
+		bets:               make(map[int]int),
+		small_blind:        s,
+		Fold:               make([]int, 0),
+		link_active_player: 0,
 	}
 }
-func Start_round(t *PokerGame) {
-	players_club := make([]Player, len(t.Players))
-	copy(players_club, t.Players)
-	play_drop(create_drop(players_club, t.Small_blind))
-}
-func play_drop(d *drop) {
+func Start_round(d *drop) {
+	k := 0
+	for _, v := range d.players {
+		if v.Status {
+			k += 1
+		}
+	}
+	if k < 2 {
+		return
+	}
 	var s string
 	var uid, value int
-	j := d.link_player + 2
 	d.blinds(d.small_blind)
 
 	for _, v := range d.players {
 		fmt.Println("bank", v.Bank, "\tcards", v.Cards.Firt_card, v.Cards.Second_card)
 	}
-
-	for j <= d.link_player {
-		i, err := d.next_player(j)
-		j = i
-		if err != nil {
-			fmt.Println("остался один игрок")
-			break
-		}
+	i := d.next_player(d.link_diller + 2)
+	for i <= d.link_active_player {
 		fmt.Println("вводи данные")
 		fmt.Scan(&s, &uid)
 		switch s {
@@ -81,10 +77,11 @@ func play_drop(d *drop) {
 		for _, v := range d.players {
 			fmt.Println("bank", v.Bank, "\tcards", v.Cards.Firt_card, v.Cards.Second_card, "\tbet", d.bets[v.Uid])
 		}
+		i = d.next_player(i + 1)
 	}
 
 	for i, v := range d.players {
 		fmt.Println(d.players[i].Bank, " -bank", "\tbet- ", d.bets[v.Uid], d.players[i].Status)
 	}
-	fmt.Println("ROUND END")
+	d.link_diller += 1
 }

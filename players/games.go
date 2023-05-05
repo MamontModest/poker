@@ -1,6 +1,7 @@
 package players
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -9,9 +10,10 @@ type PokerGame struct {
 	Max_players   int
 	Small_blind   int
 	Start_balance int
-	Players       []Player
 	Game_start    bool
+	Players       []Player
 	Game_cards    []Card
+	Drop          *drop
 }
 
 func NewPokerGame(max int, small int, balance int, status bool) *PokerGame {
@@ -28,9 +30,15 @@ func NewPokerGame(max int, small int, balance int, status bool) *PokerGame {
 type Table map[int]*PokerGame
 
 func Game_start(t *PokerGame) {
-	for {
-		Razdacha(t)
-		Start_round(t)
+	i := len(t.Players)
+	for i >= 2 {
+		one_circle(t)
+		i = 0
+		for _, v := range t.Players {
+			if v.Bank > 0 {
+				i += 1
+			}
+		}
 	}
 }
 
@@ -57,4 +65,19 @@ func Razdacha(t *PokerGame) {
 		cards_now = append(cards_now[:value], cards_now[value+1:]...)
 		t.Game_cards = append(t.Game_cards, *game_card)
 	}
+}
+
+func one_circle(t *PokerGame) {
+	fmt.Println("circle start")
+	t.Drop = create_drop(t.Players, t.Small_blind)
+	Razdacha(t)
+	Start_round(t.Drop)
+	t.Drop.
+		fmt.Println(t.Game_cards[0], t.Game_cards[1], t.Game_cards[2])
+	Start_round(t.Drop)
+	fmt.Println(t.Game_cards[3])
+	Start_round(t.Drop)
+	fmt.Println(t.Game_cards[4])
+	Start_round(t.Drop)
+	fmt.Println("circle end")
 }

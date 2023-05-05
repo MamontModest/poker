@@ -49,7 +49,7 @@ func (p *drop) raise(uid int, value int) error {
 			if v.Bank >= value && p.bets[v.Uid]+value > p.max_bet {
 				p.bets[v.Uid] += value
 				p.max_bet = p.bets[v.Uid]
-				p.link_player = i + len(p.players) - 1
+				p.link_active_player = i + len(p.players) - 1
 				p.players[i].Bank -= value
 				if p.players[i].Bank == 0 {
 					p.players[i].Status = false
@@ -70,7 +70,7 @@ func (p *drop) all_in(uid int) {
 			p.bets[v.Uid] += v.Bank
 			if p.bets[v.Uid] > p.max_bet {
 				p.max_bet = p.bets[v.Uid]
-				p.link_player = i + len(p.players) - 1
+				p.link_active_player = i + len(p.players) - 1
 			}
 			p.players[i].Bank = 0
 			p.players[i].Status = false
@@ -81,7 +81,7 @@ func (p *drop) all_in(uid int) {
 
 // раздача блайндов
 func (p *drop) blinds(value int) {
-	j := p.link_player
+	j := p.link_diller
 	max_players := len(p.players)
 	for {
 		if p.players[j%max_players].Status != false {
@@ -106,6 +106,10 @@ func (p *drop) blinds(value int) {
 	}
 }
 
-func (p *drop) next_player(j int) (int, error) {
-	return j, nil
+func (p *drop) next_player(j int) int {
+	max := len(p.players)
+	for !p.players[j%max].Status {
+		j += 1
+	}
+	return j
 }
